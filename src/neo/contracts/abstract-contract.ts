@@ -1,5 +1,5 @@
 import { ContractParam, neonAdapter, type StackItemJson } from '../n3/neon-adapter.js';
-import { type ContractWrapperConfig, InvalidParameterError } from '../types/index.js';
+import { ContractInvocationError, type ContractWrapperConfig, InvalidParameterError } from '../types/index.js';
 import { invokeMethod } from '../n3/rpc-utils.js';
 
 // Define types for stack item values and decoded results
@@ -27,39 +27,59 @@ export abstract class AbstractContract {
 
   // region value translators
   protected async getBooleanValue(methodName: string, params?: ContractParam[]): Promise<boolean> {
-    return Boolean(await this.getStackValue(methodName, params));
+    const item = await this.getStackItem(methodName, params);
+    if (item.type !== 'Boolean') {
+      throw new ContractInvocationError(`Invalid boolean value returned from contract for ${methodName}`);
+    }
+    return Boolean(item.value);
   }
 
   protected async getNumberValue(methodName: string, params?: ContractParam[]): Promise<number> {
-    return Number(await this.getStackValue(methodName, params));
+    const item = await this.getStackItem(methodName, params);
+    if (item.type !== 'Integer') {
+      throw new ContractInvocationError(`Invalid number value returned from contract for ${methodName}`);
+    }
+    return Number(item.value);
   }
 
   protected async getStringValue(methodName: string, params?: ContractParam[]): Promise<string> {
-    const result = await this.getStackValue(methodName, params);
+    const result = await this.getStackItem(methodName, params);
 
-    if (typeof result === 'string') {
-      let hexString = neonAdapter.utils.base642hex(result);
+    const value = result.value;
+    if (typeof value === 'string') {
+      const hexString = neonAdapter.utils.base642hex(value);
       return neonAdapter.utils.hexstring2str(hexString);
     } else {
-      return String(result);
+      return String(value);
     }
   }
 
   protected async getHexValue(methodName: string, params?: ContractParam[]): Promise<string> {
-    const result = await this.getStackValue(methodName, params);
+    const result = await this.getStackItem(methodName, params);
 
-    if (typeof result === 'string') {
-      return `0x${neonAdapter.utils.base642hex(result)}`;
+    let type = result.type;
+    if (type !== 'ByteString' && type !== 'Buffer') {
+      throw new ContractInvocationError(`Invalid hex value returned from contract for ${methodName}`);
+    }
+
+    const value = result.value;
+    if (typeof value === 'string') {
+      const littleEndian = neonAdapter.utils.base642hex(value);
+      return `0x${neonAdapter.utils.HexString.fromHex(littleEndian, true).toBigEndian()}`;
     } else {
-      return String(result);
+      return String(value);
     }
   }
 
   protected async getObjectValue(methodName: string, params?: ContractParam[]): Promise<DecodedStackItem> {
-    const result = await this.getStackValue(methodName, params);
+    const result = await this.getStackItem(methodName, params);
 
-    if (Array.isArray(result)) {
-      return result.map(item => this.decodeStackItem(item, methodName));
+    if(result.type !== 'Array') {
+      throw new ContractInvocationError(`Invalid object value returned from contract for ${methodName}`);
+    }
+
+    if (Array.isArray(result.value)) {
+      return result.value.map(item => this.decodeStackItem(item, methodName));
     }
 
     return this.decodeStackItem(result, methodName);
@@ -102,8 +122,8 @@ export abstract class AbstractContract {
     return item as DecodedStackItem;
   }
 
-  protected async getStackValue(methodName: string, params: ContractParam[] = []): Promise<StackItemValue> {
-    let errorMessage = `Invalid ${methodName} value returned from contract`;
+  protected async getStackItem(methodName: string, params: ContractParam[] = []): Promise<StackItemJson> {
+    const errorMessage = `Invalid ${methodName} value returned from contract`;
     return await invokeMethod(this.rpcClient, this.config.contractHash, methodName, errorMessage, params);
   }
 
@@ -123,8 +143,7 @@ export abstract class AbstractContract {
   }
 
   protected validateScriptHash(hash: string, context: string): void {
-    const cleanHash = hash.startsWith('0x') ? hash.slice(2) : hash;
-    if (!/^[0-9a-fA-F]{40}$/.test(cleanHash)) {
+    if (!this.validateHexString(hash, 40)) {
       throw new InvalidParameterError(`target hash for ${context}`, `40-character hex string, got ${hash}`);
     }
   }
@@ -139,5 +158,20 @@ export abstract class AbstractContract {
     }
   }
 
-  // endregion
+  protected validatePublicKey(pubKey: string, context: string): void {
+    if (!this.validateHexString(pubKey, 66)) {
+      throw new InvalidParameterError(`public key for ${context}`, `66-character hex string, got ${pubKey}`);
+    }
+  }
+
+  protected validateHexString(hexString: string, length: number): boolean {
+    const cleanHex = this.getCleanHex(hexString);
+    return new RegExp(`^[0-9a-fA-F]{${length}}$`).test(cleanHex);
+  }
+
+  protected getCleanHex(hexString: string) {
+    return hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+  }
+
+// endregion
 }

@@ -5,7 +5,7 @@ type InvokeReturnValue = string | boolean | number | StackItemJson[];
 
 export async function invokeMethod(
     rpcClient: RPCClient, contractHash: string, method: string, errorMessage: string, args?: unknown[],
-): Promise<InvokeReturnValue> {
+): Promise<StackItemJson> {
   const result = await rpcClient.invokeFunction(
       contractHash,
       method,
@@ -14,7 +14,7 @@ export async function invokeMethod(
 
   validateInvocationResult(result, contractHash, method);
 
-  const returnValue = result.stack[0].value;
+  const returnValue = result.stack[0];
   if (returnValue === undefined || returnValue === null) {
     throw new ContractInvocationError(errorMessage);
   }

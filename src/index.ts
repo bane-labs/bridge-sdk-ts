@@ -2,6 +2,7 @@
 export * from './neo/types/index.js';
 export * from './neo/contracts/abstract-contract.js';
 export * from './neo/contracts/message-bridge.js';
+export * from './neo/contracts/bridge-management';
 export * from './neo/wallet/wallet.js';
 export * from './neo/n3/neo-utils.js';
 export * from './neo/n3/neon-adapter.js';

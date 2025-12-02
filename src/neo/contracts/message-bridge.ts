@@ -140,6 +140,17 @@ export class MessageBridge extends AbstractContract {
     return await this.getHexValue(this.executionManager.name);
   }
 
+  async setExecutionManager(newManager: string): Promise<TransactionResult> {
+    this.validateScriptHash(newManager, this.setExecutionManager.name);
+    return await sendContractTransaction(
+        this.rpcClient,
+        this.config.account,
+        this.config.contractHash,
+        this.setExecutionManager.name,
+        [neonAdapter.create.contractParam('Hash160', newManager)]
+    );
+  }
+
   // endregion
 
   // region send messages

@@ -6,7 +6,7 @@ import {
   neonAdapter,
   RPCClient,
   Signer,
-  WitnessScope,
+  WitnessScope
 } from './neon-adapter.js';
 import { ContractInvocationError, InsufficientFundsError, type TransactionResult } from '../types/index.js';
 import { QueryLike } from '@cityofzion/neon-core/lib/rpc/Query';
@@ -46,12 +46,16 @@ export async function getGasBalance(rpcClient: RPCClient, accountAddress: string
 export async function getFeePerByte(rpcClient: RPCClient) {
   let methodName = 'getFeePerByte';
   const errorMessage = 'Unable to retrieve network fee data from PolicyContract';
-  const response = await invokeMethod(rpcClient, neonAdapter.constants.NATIVE_CONTRACT_HASH.PolicyContract, methodName,
-      errorMessage);
-  if (typeof response !== 'string' && typeof response !== 'number') {
+  const response = await invokeMethod(
+      rpcClient, neonAdapter.constants.NATIVE_CONTRACT_HASH.PolicyContract, methodName, errorMessage
+  );
+  if (response.type !== 'Integer') {
     throw new ContractInvocationError(errorMessage);
   }
-  return neonAdapter.utils.BigInteger.fromNumber(response);
+  if (typeof response.value !== 'string' && typeof response.value !== 'number') {
+    throw new ContractInvocationError(errorMessage);
+  }
+  return neonAdapter.utils.BigInteger.fromNumber(response.value);
 }
 
 export async function getSystemFee(rpcClient: RPCClient, script: HexString, txSigners: Signer[]) {

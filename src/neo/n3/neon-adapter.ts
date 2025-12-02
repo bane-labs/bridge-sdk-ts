@@ -40,6 +40,7 @@ import type { BigInteger, HexString } from '@cityofzion/neon-core/lib/u';
 import type { StackItemJson } from '@cityofzion/neon-core/lib/sc/StackItem';
 // Import tx module from neon-core to access WitnessScope
 import { WitnessScope } from '@cityofzion/neon-core/lib/tx/components/WitnessScope';
+import { StackItemType } from '@cityofzion/neon-core/lib/sc/StackItem';
 
 // Normalize the neon-js exports to proper ESM structure
 // CRITICAL WORKAROUND: neon-js has complex ESM/CJS interop requirements
@@ -101,7 +102,7 @@ export type {
   HexString,
 };
 // Re-export WitnessScope class for runtime usage
-export { WitnessScope };
+export { WitnessScope, StackItemType };
 
 // Define a union type for contract parameter values for convenience
 type ContractParamValueType = string | number | boolean | ContractParamJson[] | null | undefined;
@@ -111,7 +112,6 @@ export interface NeonAdapter {
     wallet: (walletJson: WalletJSON) => Wallet;
     account: (key: string) => Account;
     privateKey: () => string;
-    signature: (tx: string, privateKey: string) => string;
     contractParam: (type: keyof typeof sc.ContractParamType, value?: ContractParamValueType) => ContractParam;
     script: typeof sc.createScript;
     scriptBuilder: () => ScriptBuilder;
@@ -183,9 +183,6 @@ export const neonAdapter: NeonAdapter = {
     },
     privateKey: (): string => {
       return Neon.create.privateKey();
-    },
-    signature: (tx: string, privateKey: string): string => {
-      return Neon.create.signature(tx, privateKey);
     },
     contractParam: (type: keyof typeof sc.ContractParamType, value?: ContractParamValueType): ContractParam => {
       // Runtime validation to ensure type safety
