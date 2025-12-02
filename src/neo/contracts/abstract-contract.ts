@@ -1,4 +1,10 @@
-import { ContractParam, neonAdapter, type StackItemJson } from '../n3/neon-adapter.js';
+import {
+  ContractParam,
+  type ContractParamMap,
+  ContractParamType,
+  neonAdapter,
+  type StackItemJson
+} from '../n3/neon-adapter.js';
 import { ContractInvocationError, type ContractWrapperConfig, InvalidParameterError } from '../types/index.js';
 import { invokeFunction } from '../n3/rpc-utils.js';
 
@@ -74,7 +80,7 @@ export abstract class AbstractContract {
   protected async getObjectValue(methodName: string, params?: ContractParam[]): Promise<DecodedStackItem> {
     const result = await this.getStackItem(methodName, params);
 
-    if(result.type !== 'Array') {
+    if (result.type !== 'Array') {
       throw new ContractInvocationError(`Invalid object value returned from contract for ${methodName}`);
     }
 
@@ -125,6 +131,30 @@ export abstract class AbstractContract {
   protected async getStackItem(methodName: string, params: ContractParam[] = []): Promise<StackItemJson> {
     const errorMessage = `Invalid ${methodName} value returned from contract`;
     return await invokeFunction(this.rpcClient, this.config.contractHash, methodName, errorMessage, params);
+  }
+
+  // endregion
+
+  // region parameter helpers
+  /** Creates a Map ContractParamJson from a Map of key-value pairs.
+   * @param mapEntries - The Map containing key-value pairs.
+   * @param keyType - The ContractParamType for the keys (default is 'String').
+   * @param valueType - The ContractParamType for the values (default is 'Integer').
+   * @returns An array of ContractParamJson objects representing the Map entries.
+   *
+   */
+  protected createMapParam(
+      mapEntries: Map<any, any>,
+      keyType: keyof typeof ContractParamType = 'String',
+      valueType: keyof typeof ContractParamType = 'Integer'
+  ): ContractParamMap {
+
+    return Array.from(mapEntries).map(([key, value]) => {
+      return {
+        key: neonAdapter.create.contractParam(keyType, key),
+        value: neonAdapter.create.contractParam(valueType, value)
+      };
+    });
   }
 
   // endregion

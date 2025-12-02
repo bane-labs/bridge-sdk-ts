@@ -154,6 +154,12 @@ export class MessageBridge extends AbstractContract {
   // endregion
 
   // region send messages
+  /** Sends an executable message to the MessageBridge contract.
+   *
+   * @param params The parameters for sending the executable message.
+   *
+   * @returns A promise that resolves to the transaction result of sending the message.
+   */
   async sendExecutableMessage(params: SendExecutableMessageParams): Promise<TransactionResult> {
     this.validateMessageParams(params, this.sendExecutableMessage.name);
 
@@ -178,6 +184,12 @@ export class MessageBridge extends AbstractContract {
     );
   }
 
+  /** Sends a result message to the MessageBridge contract.
+   *
+   * @param params The parameters for sending the result message.
+   *
+   * @returns A promise that resolves to the transaction result of sending the message.
+   */
   async sendResultMessage(params: SendResultMessageParams): Promise<TransactionResult> {
     this.validateResultMessageParams(params, this.sendResultMessage.name);
 
@@ -199,6 +211,12 @@ export class MessageBridge extends AbstractContract {
     );
   }
 
+  /** Sends a store-only message to the MessageBridge contract.
+   *
+   * @param params The parameters for sending the store-only message.
+   *
+   * @returns A promise that resolves to the transaction result of sending the message.
+   */
   async sendStoreOnlyMessage(params: SendStoreOnlyMessageParams): Promise<TransactionResult> {
     this.validateMessageParams(params, this.sendStoreOnlyMessage.name);
 
@@ -225,6 +243,18 @@ export class MessageBridge extends AbstractContract {
   // endregion
 
   // region utils
+  /** Serializes a contract call into a byte array.
+   *
+   * @param target The target contract script hash.
+   * @param method The method name to call.
+   * @param callFlags The call flags for the contract call.
+   * @param args The arguments for the contract call.
+   *
+   * @returns A promise that resolves to the serialized call as a hex string.
+   *
+   * @remarks
+   * This is useful for preparing contract calls to be sent via the MessageBridge from the EVM side.
+   */
   async serializeCall(target: string, method: string, callFlags: number, args: ContractParamJson[]): Promise<string> {
     this.validateScriptHash(target, this.serializeCall.name);
     this.validateCallFlags(callFlags, this.serializeCall.name);
@@ -292,6 +322,12 @@ export class MessageBridge extends AbstractContract {
   // endregion
 
   // region execute
+  /** Executes a message identified by its nonce.
+   *
+   * @param nonce The nonce of the message to execute.
+   *
+   * @returns A promise that resolves to the transaction result of the execution.
+   */
   async executeMessage(nonce: number): Promise<TransactionResult> {
     this.validateUint(nonce, this.executeMessage.name);
 

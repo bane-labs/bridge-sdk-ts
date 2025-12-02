@@ -31,6 +31,7 @@ import NeonImport, { api, CONST, experimental, logging, rpc, sc, tx, u, wallet }
 import type { InvokeResult, QueryLike } from '@cityofzion/neon-core/lib/rpc/Query';
 import type { NetworkJSON } from '@cityofzion/neon-core/lib/rpc/Network';
 import type { ContractParamJson } from '@cityofzion/neon-core/lib/sc/ContractParam';
+import type { ContractParamMap } from '@cityofzion/neon-core/lib/sc/ContractParam';
 import type { AccountJSON, WalletJSON } from '@cityofzion/neon-core/lib/wallet';
 import type { KeyType } from '@cityofzion/neon-core/lib/wallet/Account';
 import type { ScryptParams } from '@cityofzion/neon-core/lib/wallet/nep2';
@@ -38,9 +39,10 @@ import type { TransactionLike } from '@cityofzion/neon-core/lib/tx/transaction/T
 import type { SignerLike } from '@cityofzion/neon-core/lib/tx/components/Signer';
 import type { BigInteger, HexString } from '@cityofzion/neon-core/lib/u';
 import type { StackItemJson } from '@cityofzion/neon-core/lib/sc/StackItem';
-// Import tx module from neon-core to access WitnessScope
+// Import enums needed at runtime
 import { WitnessScope } from '@cityofzion/neon-core/lib/tx/components/WitnessScope';
 import { StackItemType } from '@cityofzion/neon-core/lib/sc/StackItem';
+import { ContractParamType } from '@cityofzion/neon-core/lib/sc/ContractParam';
 
 // Normalize the neon-js exports to proper ESM structure
 // CRITICAL WORKAROUND: neon-js has complex ESM/CJS interop requirements
@@ -100,12 +102,15 @@ export type {
   InvokeResult,
   StackItemJson,
   HexString,
+  ContractParamMap
 };
 // Re-export WitnessScope class for runtime usage
-export { WitnessScope, StackItemType };
+export { WitnessScope, StackItemType, ContractParamType };
 
-// Define a union type for contract parameter values for convenience
-type ContractParamValueType = string | number | boolean | ContractParamJson[] | null | undefined;
+// Define a union type for contract parameter values for convenience including a map
+type ContractParamValueType = string | number | boolean | ContractParamMap | ContractParamJson[] | null | undefined;
+// Type required by Neon.create.contractParam
+type NeonContractParamValueType = string | number | boolean | ContractParamJson[] | null | undefined;
 
 export interface NeonAdapter {
   create: {
@@ -190,7 +195,8 @@ export const neonAdapter: NeonAdapter = {
         const validTypes = Object.keys(sc.ContractParamType).join(', ');
         throw new Error(`Invalid contract parameter type: ${String(type)}. Valid types are: ${validTypes}`);
       }
-      return Neon.create.contractParam(type, value);
+      // Cast value to the type expected by neon-js create method (because of map type)
+      return Neon.create.contractParam(type, value as NeonContractParamValueType);
     },
     script: Neon.create.script,
     scriptBuilder: (): ScriptBuilder => {

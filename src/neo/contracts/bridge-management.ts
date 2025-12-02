@@ -8,16 +8,27 @@ export class BridgeManagement extends AbstractContract {
     super(config);
   }
 
+  /** Set a new owner for the BridgeManagement contract
+   *
+   * @param newOwner - The script hash of the new owner
+   *
+   * @returns TransactionResult containing the transaction hash and other details
+   * @throws Error - ALWAYS: Not implemented
+   *
+   * @remarks
+   * The newOwner must also be a witness to this transaction - currently not implemented in this SDK
+   */
   async setOwner(newOwner: string): Promise<TransactionResult> {
-    this.validateScriptHash(newOwner, this.setOwner.name);
-    return await sendContractTransaction(
-        this.rpcClient,
-        this.config.account,
-        this.config.contractHash,
-        this.setOwner.name,
-        [neonAdapter.create.contractParam('Hash160', newOwner)],
-        []
-    );
+    throw new Error(`setOwner ${this.setOwner.name} is not implemented: newOwner witness requirement not supported by SDK`);
+    // this.validateScriptHash(newOwner, this.setOwner.name);
+    // return await sendContractTransaction(
+    //     this.rpcClient,
+    //     this.config.account,
+    //     this.config.contractHash,
+    //     this.setOwner.name,
+    //     [neonAdapter.create.contractParam('Hash160', newOwner)],
+    //     []
+    // );
   }
 
   async setRelayer(newRelayer: string): Promise<TransactionResult> {

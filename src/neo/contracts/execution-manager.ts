@@ -53,10 +53,24 @@ export class ExecutionManager extends AbstractContract {
   // endregion
 
   // region execution
+  /** Get the current executing nonce
+   *
+   * @returns The current executing nonce
+   *
+   * @remarks
+   * This nonce represents the message currently being executed by the Execution Manager.
+   * It is used to track the progress of message execution *while* the execution is ongoing.
+   * Once the execution is complete, this nonce will no longer represent an active execution.
+   *
+   */
   async getExecutingNonce(): Promise<number> {
     return await this.getNumberValue(this.getExecutingNonce.name);
   }
 
+  /** Execute a message with the given nonce and executable code
+   *
+   * @returns A promise that resolves to the transaction result of the execution
+   */
   async executeMessage(nonce: number, executableCode: string): Promise<TransactionResult> {
     this.validateUint(nonce, this.executeMessage.name);
 
