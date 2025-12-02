@@ -1,4 +1,4 @@
-import { invokeMethod, invokeScript } from './rpc-utils.js';
+import { invokeFunction, invokeScript } from './rpc-utils.js';
 import {
   Account,
   type ContractParam,
@@ -46,7 +46,7 @@ export async function getGasBalance(rpcClient: RPCClient, accountAddress: string
 export async function getFeePerByte(rpcClient: RPCClient) {
   let methodName = 'getFeePerByte';
   const errorMessage = 'Unable to retrieve network fee data from PolicyContract';
-  const response = await invokeMethod(
+  const response = await invokeFunction(
       rpcClient, neonAdapter.constants.NATIVE_CONTRACT_HASH.PolicyContract, methodName, errorMessage
   );
   if (response.type !== 'Integer') {

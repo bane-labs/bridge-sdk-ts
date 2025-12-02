@@ -1,6 +1,6 @@
 import { ContractParam, neonAdapter, type StackItemJson } from '../n3/neon-adapter.js';
 import { ContractInvocationError, type ContractWrapperConfig, InvalidParameterError } from '../types/index.js';
-import { invokeMethod } from '../n3/rpc-utils.js';
+import { invokeFunction } from '../n3/rpc-utils.js';
 
 // Define types for stack item values and decoded results
 type StackItemValue = string | number | boolean | null | StackItemJson[];
@@ -124,7 +124,7 @@ export abstract class AbstractContract {
 
   protected async getStackItem(methodName: string, params: ContractParam[] = []): Promise<StackItemJson> {
     const errorMessage = `Invalid ${methodName} value returned from contract`;
-    return await invokeMethod(this.rpcClient, this.config.contractHash, methodName, errorMessage, params);
+    return await invokeFunction(this.rpcClient, this.config.contractHash, methodName, errorMessage, params);
   }
 
   // endregion
