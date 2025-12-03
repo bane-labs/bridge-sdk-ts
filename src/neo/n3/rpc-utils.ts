@@ -1,10 +1,18 @@
-import { type HexString, type InvokeResult, neonAdapter, RPCClient, Signer, StackItemJson } from './neon-adapter';
+import {
+  ContractParam,
+  type HexString,
+  type InvokeResult,
+  neonAdapter,
+  RPCClient,
+  Signer,
+  StackItemJson
+} from './neon-adapter';
 import { ContractInvocationError } from '../types';
 
 type InvokeReturnValue = string | boolean | number | StackItemJson[];
 
 export async function invokeFunction(
-    rpcClient: RPCClient, contractHash: string, method: string, errorMessage: string, args?: unknown[],
+    rpcClient: RPCClient, contractHash: string, method: string, errorMessage: string, args?: ContractParam[],
 ): Promise<StackItemJson> {
   const result = await rpcClient.invokeFunction(
       contractHash,

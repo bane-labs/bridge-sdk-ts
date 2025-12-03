@@ -34,10 +34,14 @@ export abstract class AbstractContract {
   // region value translators
   protected async getBooleanValue(methodName: string, params?: ContractParam[]): Promise<boolean> {
     const item = await this.getStackItem(methodName, params);
-    if (item.type !== 'Boolean') {
-      throw new ContractInvocationError(`Invalid boolean value returned from contract for ${methodName}`);
+    switch (item.type) {
+      case 'Boolean':
+        return Boolean(item.value);
+      case 'Integer':
+        return Number(item.value) === 1;
+      default:
+        throw new ContractInvocationError(`Invalid boolean value returned from contract for ${methodName}`);
     }
-    return Boolean(item.value);
   }
 
   protected async getNumberValue(methodName: string, params?: ContractParam[]): Promise<number> {
@@ -70,11 +74,18 @@ export abstract class AbstractContract {
 
     const value = result.value;
     if (typeof value === 'string') {
-      const littleEndian = neonAdapter.utils.base642hex(value);
-      return `0x${neonAdapter.utils.HexString.fromHex(littleEndian, true).toBigEndian()}`;
+      return neonAdapter.utils.base642hex(value)
     } else {
       return String(value);
     }
+  }
+
+  protected async getHash160Value(methodName: string, params?: ContractParam[]): Promise<string> {
+    let littleEndian = await this.getHexValue(methodName, params);
+    if (littleEndian.length !== 40) {
+      throw new ContractInvocationError(`Invalid Hash160 value returned from contract for ${methodName}`);
+    }
+    return `0x${neonAdapter.utils.HexString.fromHex(littleEndian, true).toBigEndian()}`;
   }
 
   protected async getObjectValue(methodName: string, params?: ContractParam[]): Promise<DecodedStackItem> {
@@ -110,7 +121,19 @@ export abstract class AbstractContract {
         case 'Pointer':
           if (typeof value === 'string') {
             try {
-              return `0x${neonAdapter.utils.base642hex(value)}`;
+              let hexBytes = neonAdapter.utils.base642hex(value);
+              // Optimistically assume that if it has a 40 character length, it's a Hash160 and convert to big-endian
+              //
+              // In the case of the bridge, when getting an address from EVM as a store-only/response message,
+              // it will be reversed at the output because in a recursive method we can't differentiate between expected
+              // Hash160 outputs and other ByteString outputs. In this case please ensure that you reverse it
+              // back to big-endian when validating the output object.
+              if (hexBytes.length === 40) {
+                // Warn that this is an assumption
+                console.warn(`Assuming Hash160 return type for item: ${item}, method: ${methodName} based on length`);
+                hexBytes = neonAdapter.utils.HexString.fromHex(hexBytes, true).toBigEndian();
+              }
+              return `0x${hexBytes}`;
             } catch {
               return value;
             }
@@ -144,12 +167,15 @@ export abstract class AbstractContract {
    *
    */
   protected createMapParam(
+      // Use any for key and value to allow flexibility in the create.contractParam method.
       mapEntries: Map<any, any>,
       keyType: keyof typeof ContractParamType = 'String',
       valueType: keyof typeof ContractParamType = 'Integer'
   ): ContractParamMap {
 
     return Array.from(mapEntries).map(([key, value]) => {
+      value = this.convertToHexString(valueType, value);
+      key = this.convertToHexString(keyType, key);
       return {
         key: neonAdapter.create.contractParam(keyType, key),
         value: neonAdapter.create.contractParam(valueType, value)
@@ -157,7 +183,28 @@ export abstract class AbstractContract {
     });
   }
 
-  // endregion
+  protected getByteArrayContractParamArray(callHex: string, isLittleEndian: boolean = true): ContractParam[] {
+    let littleEndianHexString = neonAdapter.utils.HexString.fromHex(callHex, isLittleEndian) as any;
+    return [
+      neonAdapter.create.contractParam('ByteArray', littleEndianHexString),
+    ];
+  }
+
+  /** Validates whether a given string is a valid hexadecimal string of a specified length.
+   *
+   * @param hexString - The string to validate.
+   * @param length - The expected length of the hexadecimal string. If length is 0, any length is accepted.
+   * @returns True if the string is a valid hexadecimal string of the specified length, false otherwise.
+   */
+  protected validateHexString(hexString: string, length: number): boolean {
+    const cleanHex = this.getCleanHex(hexString);
+    if (length > 0) {
+      return new RegExp(`^[0-9a-fA-F]{${length}}$`).test(cleanHex);
+    }
+    return new RegExp(`^[0-9a-fA-F]+$`).test(cleanHex);
+  }
+
+// endregion
 
   // region parameter validators
   protected validateUint(uint: number, context: string): void {
@@ -194,9 +241,11 @@ export abstract class AbstractContract {
     }
   }
 
-  protected validateHexString(hexString: string, length: number): boolean {
-    const cleanHex = this.getCleanHex(hexString);
-    return new RegExp(`^[0-9a-fA-F]{${length}}$`).test(cleanHex);
+  private convertToHexString(keyType: keyof typeof ContractParamType, value: any) {
+    if (keyType in ['ByteString', 'Buffer', 'PublicKey', 'Hash160', 'Hash256'] && typeof value === 'string') {
+      value = neonAdapter.utils.HexString.fromHex(value);
+    }
+    return value;
   }
 
   protected getCleanHex(hexString: string) {

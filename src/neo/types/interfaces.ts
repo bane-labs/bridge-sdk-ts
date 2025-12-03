@@ -1,4 +1,5 @@
-import type { Account } from '../n3/neon-adapter';
+import { Account, ContractParamType } from '../n3/neon-adapter';
+import { StackItemJson } from "@cityofzion/neon-core/lib/sc/StackItem";
 
 /**
  * @fileoverview Interface definitions for Message Bridge operations
@@ -94,3 +95,5 @@ export interface ExecutableState {
 }
 
 export type { Account };
+
+export type ExecutionResultType = string | boolean | number | StackItemJson[] | undefined;

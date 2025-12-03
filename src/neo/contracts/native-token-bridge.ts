@@ -72,7 +72,7 @@ export class NativeTokenBridge extends AbstractContract {
   }
 
   async management(): Promise<string> {
-    return await this.getHexValue(this.management.name);
+    return await this.getHash160Value(this.management.name);
   }
 
   async unclaimedRewards(): Promise<number> {
@@ -179,7 +179,7 @@ export class NativeTokenBridge extends AbstractContract {
 
   /** Withdraw native tokens from the bridge
    *
-   * @param withdrawalRoot The withdrawal root
+   * @param withdrawalRoot The withdrawal root in hex string format
    * @param signatures A map of validator public keys to their signatures
    * @param withdrawals An array of withdrawal objects
    *
@@ -190,13 +190,14 @@ export class NativeTokenBridge extends AbstractContract {
    */
   async withdrawNative(withdrawalRoot: string, signatures: Map<string, string>, withdrawals: any[]): Promise<TransactionResult> {
     const signaturesMapParam = this.createMapParam(signatures, 'PublicKey', 'ByteArray');
+    let rootBuffer = Buffer.from(withdrawalRoot.replace(/^0x/, ''), 'hex'); // validate hex string
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
         this.config.contractHash,
         this.withdrawNative.name,
         [
-          neonAdapter.create.contractParam('ByteArray', withdrawalRoot),
+          neonAdapter.create.contractParam('ByteArray', rootBuffer.toString('base64')),
           neonAdapter.create.contractParam('Map', signaturesMapParam),
           neonAdapter.create.contractParam('Array', withdrawals)
         ]
@@ -220,7 +221,7 @@ export class NativeTokenBridge extends AbstractContract {
   }
 
   async nativeToken(): Promise<string> {
-    return await this.getHexValue(this.nativeToken.name);
+    return await this.getHash160Value(this.nativeToken.name);
   }
 
   async getNativeBridge(): Promise<any> {

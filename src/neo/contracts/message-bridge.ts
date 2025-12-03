@@ -1,4 +1,4 @@
-import { neonAdapter } from '../n3/neon-adapter.js';
+import { ContractParam, neonAdapter } from '../n3/neon-adapter.js';
 import {
   type ContractWrapperConfig,
   type ExecutableState,
@@ -14,7 +14,7 @@ import {
   type TransactionResult,
 } from '../types/index.js';
 import { sendContractTransaction } from '../n3/neo-utils.js';
-import { BasicParams, MessageParams } from '../types/interfaces.js';
+import { BasicParams, ExecutionResultType, MessageParams } from '../types/interfaces.js';
 import { ContractParamJson } from '@cityofzion/neon-core/lib/sc/ContractParam';
 import { AbstractContract } from './abstract-contract.js';
 
@@ -133,11 +133,11 @@ export class MessageBridge extends AbstractContract {
 
   // region contracts
   async management(): Promise<string> {
-    return await this.getHexValue(this.management.name);
+    return await this.getHash160Value(this.management.name);
   }
 
   async executionManager(): Promise<string> {
-    return await this.getHexValue(this.executionManager.name);
+    return await this.getHash160Value(this.executionManager.name);
   }
 
   async setExecutionManager(newManager: string): Promise<TransactionResult> {
@@ -319,6 +319,35 @@ export class MessageBridge extends AbstractContract {
     };
   }
 
+  /** Validates whether a serialized contract call is valid.
+   *
+   * @param serializedCall The serialized contract call as hex string. This parameter is expected to be little-endian.
+   *
+   * @returns A promise that resolves to true if the call is valid, false otherwise.
+   */
+  async isValidCall(serializedCall: string): Promise<boolean> {
+    this.validateHexString(serializedCall, 0);
+    const params = this.getByteArrayContractParamArray(serializedCall);
+
+    return await this.getBooleanValue(this.isValidCall.name, params);
+  }
+
+  /** Checks whether a serialized contract call is allowed to be executed.
+   *
+   * @param serializedCall The serialized contract call as hex string or byte array.
+   *
+   * @returns A promise that resolves to true if the call is allowed, false otherwise.
+   */
+  async isAllowedCall(serializedCall: string): Promise<boolean> {
+    this.validateHexString(serializedCall, 0);
+    let littleEndianHexString = neonAdapter.utils.HexString.fromHex(serializedCall, true) as any;
+    const params = [
+      neonAdapter.create.contractParam('ByteArray', littleEndianHexString),
+    ];
+
+    return await this.getBooleanValue(this.isAllowedCall.name, params);
+  }
+
   // endregion
 
   // region execute
@@ -448,24 +477,27 @@ export class MessageBridge extends AbstractContract {
     };
   }
 
-  async getEvmExecutionResult(relatedNeoToEvmMessageNonce: number): Promise<string> {
+  async getEvmExecutionResult(relatedNeoToEvmMessageNonce: number): Promise<ExecutionResultType> {
     this.validateUint(relatedNeoToEvmMessageNonce, this.getEvmExecutionResult.name);
 
     const params = [
       neonAdapter.create.contractParam('Integer', relatedNeoToEvmMessageNonce),
     ];
 
-    return await this.getHexValue(this.getEvmExecutionResult.name, params);
+    let stackItemJson = await this.getStackItem(this.getEvmExecutionResult.name, params);
+
+    return stackItemJson.value;
   }
 
-  async getNeoExecutionResult(relatedEvmToNeoMessageNonce: number): Promise<string> {
+  async getNeoExecutionResult(relatedEvmToNeoMessageNonce: number): Promise<ExecutionResultType> {
     this.validateUint(relatedEvmToNeoMessageNonce, this.getNeoExecutionResult.name);
 
     const params = [
       neonAdapter.create.contractParam('Integer', relatedEvmToNeoMessageNonce),
     ];
 
-    return await this.getHexValue(this.getNeoExecutionResult.name, params);
+    let stackItemJson = await this.getStackItem(this.getNeoExecutionResult.name, params);
+    return stackItemJson.value;
   }
 
   // endregion

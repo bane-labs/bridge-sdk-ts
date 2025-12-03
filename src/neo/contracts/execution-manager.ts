@@ -5,6 +5,7 @@ import {
 } from '../types/index.js';
 import { sendContractTransaction } from '../n3/neo-utils.js';
 import { AbstractContract } from './abstract-contract.js';
+import { ContractParamJson } from "@cityofzion/neon-core/lib/sc/ContractParam";
 
 export class ExecutionManager extends AbstractContract {
 
@@ -70,6 +71,9 @@ export class ExecutionManager extends AbstractContract {
   /** Execute a message with the given nonce and executable code
    *
    * @returns A promise that resolves to the transaction result of the execution
+   *
+   * @remarks
+   * This function can only be called by the Message Bridge contract.
    */
   async executeMessage(nonce: number, executableCode: string): Promise<TransactionResult> {
     this.validateUint(nonce, this.executeMessage.name);
@@ -89,7 +93,7 @@ export class ExecutionManager extends AbstractContract {
   // endregion
 
   // region serialization and validation
-  async serializeCall(target: string, method: string, callFlags: number, args: any[]): Promise<string> {
+  async serializeCall(target: string, method: string, callFlags: number, args: ContractParamJson[]): Promise<string> {
     this.validateScriptHash(target, this.serializeCall.name);
     this.validateCallFlags(callFlags, this.serializeCall.name);
 
@@ -101,27 +105,37 @@ export class ExecutionManager extends AbstractContract {
     ]);
   }
 
+  /** Validate a serialized call
+   *
+   * @param serializedCall - The serialized call as a hex string. It is assumed to be a little-endian byte array.
+   * @returns A promise that resolves to true if the call is valid, false otherwise
+   *
+   */
   async isValidCall(serializedCall: string): Promise<boolean> {
-    return await this.getBooleanValue(this.isValidCall.name, [
-      neonAdapter.create.contractParam('ByteArray', serializedCall)
-    ]);
+    this.validateHexString(serializedCall, 0);
+    return await this.getBooleanValue(this.isValidCall.name, this.getByteArrayContractParamArray(serializedCall, true));
   }
 
+  /** Check if a serialized call is allowed
+   *
+   * @param serializedCall - The serialized call as a hex string. It is assumed to be a little-endian byte array.
+   * @returns A promise that resolves to true if the call is allowed, false otherwise
+   *
+   */
   async isAllowedCall(serializedCall: string): Promise<boolean> {
-    return await this.getBooleanValue(this.isAllowedCall.name, [
-      neonAdapter.create.contractParam('ByteArray', serializedCall)
-    ]);
+    this.validateHexString(serializedCall, 0);
+    return await this.getBooleanValue(this.isAllowedCall.name, this.getByteArrayContractParamArray(serializedCall, true));
   }
 
   // endregion
 
   // region contracts
   async bridgeManagement(): Promise<string> {
-    return await this.getHexValue(this.bridgeManagement.name);
+    return await this.getHash160Value(this.bridgeManagement.name);
   }
 
   async messageBridge(): Promise<string> {
-    return await this.getHexValue(this.messageBridge.name);
+    return await this.getHash160Value(this.messageBridge.name);
   }
 
   // endregion
