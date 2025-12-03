@@ -189,7 +189,7 @@ export class NativeTokenBridge extends AbstractContract {
    * Only the Relayer may call this method
    */
   async withdrawNative(withdrawalRoot: string, signatures: Map<string, string>, withdrawals: any[]): Promise<TransactionResult> {
-    const signaturesMapParam = this.createMapParam(signatures, 'PublicKey', 'ByteArray');
+    const signaturesMapParam = this.createMapParam(signatures, 'ByteArray', 'ByteArray');
     let rootBuffer = Buffer.from(withdrawalRoot.replace(/^0x/, ''), 'hex'); // validate hex string
     return await sendContractTransaction(
         this.rpcClient,
@@ -232,6 +232,15 @@ export class NativeTokenBridge extends AbstractContract {
     return await this.getNumberValue(this.nativeDepositFee.name);
   }
 
+  /** Set native deposit fee
+   *
+   * @param newFee The new deposit fee
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setNativeDepositFee(newFee: number): Promise<TransactionResult> {
     this.validateUint(newFee, this.setNativeDepositFee.name);
 
@@ -248,6 +257,15 @@ export class NativeTokenBridge extends AbstractContract {
     return await this.getNumberValue(this.minNativeDeposit.name);
   }
 
+  /** Set native minimum deposit amount
+   *
+   * @param newMinAmount The new minimum deposit amount
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setMinNativeDeposit(newMinAmount: number): Promise<TransactionResult> {
     this.validateUint(newMinAmount, this.setMinNativeDeposit.name);
 
@@ -264,6 +282,15 @@ export class NativeTokenBridge extends AbstractContract {
     return await this.getNumberValue(this.maxNativeDeposit.name);
   }
 
+  /** Set native maximum deposit amount
+   *
+   * @param newMaxAmount The new maximum deposit amount
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setMaxNativeDeposit(newMaxAmount: number): Promise<TransactionResult> {
     this.validateUint(newMaxAmount, this.setMaxNativeDeposit.name);
 
@@ -280,6 +307,15 @@ export class NativeTokenBridge extends AbstractContract {
     return await this.getNumberValue(this.maxTotalDepositedNative.name);
   }
 
+  /** Set native maximum total deposited amount
+   *
+   * @param newMaxTotalDeposited The new maximum total deposited amount
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setMaxTotalDepositedNative(newMaxTotalDeposited: number): Promise<TransactionResult> {
     this.validateUint(newMaxTotalDeposited, this.setMaxTotalDepositedNative.name);
 
@@ -438,7 +474,7 @@ export class NativeTokenBridge extends AbstractContract {
       withdrawals: any[]
   ): Promise<TransactionResult> {
     this.validateScriptHash(token, this.withdrawToken.name);
-    const signaturesMapParam = this.createMapParam(signatures, 'PublicKey', 'ByteArray');
+    const signaturesMapParam = this.createMapParam(signatures, 'ByteArray', 'ByteArray');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -453,8 +489,17 @@ export class NativeTokenBridge extends AbstractContract {
     );
   }
 
+  /** Set token deposit fees
+   *
+   * @param newDepositFees A map of token script hashes to their new deposit fees
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setTokenDepositFee(newDepositFees: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newDepositFees, 'Hash160', 'Integer');
+    const mapParam = this.createMapParam(newDepositFees, 'ByteArray', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -488,8 +533,17 @@ export class NativeTokenBridge extends AbstractContract {
     ]);
   }
 
+  /** Set token minimum deposit amounts
+   *
+   * @param newMinDeposits A map of token script hashes to their new minimum deposit amounts
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setMinTokenDeposit(newMinDeposits: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newMinDeposits, 'Hash160', 'Integer');
+    const mapParam = this.createMapParam(newMinDeposits, 'ByteArray', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -507,8 +561,17 @@ export class NativeTokenBridge extends AbstractContract {
     ]);
   }
 
+  /** Set token maximum deposit amounts
+   *
+   * @param newMaxDeposits A map of token script hashes to their new maximum deposit amounts
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setMaxTokenDeposit(newMaxDeposits: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newMaxDeposits, 'Hash160', 'Integer');
+    const mapParam = this.createMapParam(newMaxDeposits, 'ByteArray', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -527,8 +590,17 @@ export class NativeTokenBridge extends AbstractContract {
     ]);
   }
 
+  /** Set token maximum withdrawals
+   *
+   * @param newMaxWithdrawals A map of token script hashes to their new maximum withdrawals
+   *
+   * @returns A promise that resolves to a TransactionResult
+   *
+   * @remarks
+   * Only the Governor may call this method
+   */
   async setMaxTokenWithdrawals(newMaxWithdrawals: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newMaxWithdrawals, 'Hash160', 'Integer');
+    const mapParam = this.createMapParam(newMaxWithdrawals, 'ByteArray', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
