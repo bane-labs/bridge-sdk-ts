@@ -11,18 +11,9 @@ import {
 import { ContractInvocationError, InsufficientFundsError, type TransactionResult } from '../types/index.js';
 import { QueryLike } from '@cityofzion/neon-core/lib/rpc/Query';
 import { RpcQueryError } from '../types/errors.js';
+import { AssetBalance, BalanceResponse } from "../types/interfaces";
 
-interface AssetBalance {
-  assethash: string;
-  amount: string;
-  lastupdatedblock: number;
-}
-
-interface BalanceResponse {
-  balance: Array<AssetBalance>;
-}
-
-export async function getGasBalance(rpcClient: RPCClient, accountAddress: string) {
+export async function getAllBalances(rpcClient: RPCClient, accountAddress: string): Promise<AssetBalance[]> {
   let balanceResponse: BalanceResponse;
   const getNep17balances = 'getnep17balances';
   try {
@@ -38,7 +29,12 @@ export async function getGasBalance(rpcClient: RPCClient, accountAddress: string
   } catch (e) {
     throw new RpcQueryError('Unable to get balances: RPC plugin not available', getNep17balances);
   }
-  return balanceResponse.balance.find((bal) =>
+  return balanceResponse.balance;
+}
+
+export async function getGasBalance(rpcClient: RPCClient, accountAddress: string): Promise<string | undefined> {
+  const balances = await getAllBalances(rpcClient, accountAddress);
+  return balances.find((bal) =>
       bal.assethash.includes(neonAdapter.constants.NATIVE_CONTRACT_HASH.GasToken),
   )?.amount;
 }

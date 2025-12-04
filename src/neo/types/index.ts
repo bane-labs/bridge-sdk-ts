@@ -28,4 +28,6 @@ export type {
   NeoMetadataUnion,
   ExecutableState,
   Account,
+  AssetBalance,
+  BalanceResponse
 } from './interfaces';

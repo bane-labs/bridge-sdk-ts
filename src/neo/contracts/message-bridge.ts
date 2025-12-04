@@ -1,4 +1,4 @@
-import { ContractParam, neonAdapter } from '../n3/neon-adapter.js';
+import { neonAdapter } from '../n3/neon-adapter.js';
 import {
   type ContractWrapperConfig,
   type ExecutableState,
@@ -158,12 +158,14 @@ export class MessageBridge extends AbstractContract {
    *
    * @param params The parameters for sending the executable message.
    *
+   * @remarks
+   * Currently, the fee sponsor must be the sender account.
    * @returns A promise that resolves to the transaction result of sending the message.
    */
   async sendExecutableMessage(params: SendExecutableMessageParams): Promise<TransactionResult> {
     this.validateMessageParams(params, this.sendExecutableMessage.name);
 
-    let feeSponsor = this.getValidSponsor();
+    let feeSponsor = this.getValidSponsor(params);
     const maxFee = this.getValidMaxFee(params);
     let rawMessage = this.getValidRawMessage(params);
 
@@ -188,12 +190,14 @@ export class MessageBridge extends AbstractContract {
    *
    * @param params The parameters for sending the result message.
    *
+   * @remarks
+   * Currently, the fee sponsor must be the sender account.
    * @returns A promise that resolves to the transaction result of sending the message.
    */
   async sendResultMessage(params: SendResultMessageParams): Promise<TransactionResult> {
     this.validateResultMessageParams(params, this.sendResultMessage.name);
 
-    let feeSponsor = this.getValidSponsor();
+    let feeSponsor = this.getValidSponsor(params);
     const maxFee = this.getValidMaxFee(params);
     const args = [
       neonAdapter.create.contractParam('Integer', params.nonce),
@@ -215,12 +219,14 @@ export class MessageBridge extends AbstractContract {
    *
    * @param params The parameters for sending the store-only message.
    *
+   * @remarks
+   * Currently, the fee sponsor must be the sender account.
    * @returns A promise that resolves to the transaction result of sending the message.
    */
   async sendStoreOnlyMessage(params: SendStoreOnlyMessageParams): Promise<TransactionResult> {
     this.validateMessageParams(params, this.sendStoreOnlyMessage.name);
 
-    let feeSponsor = this.getValidSponsor();
+    let feeSponsor = this.getValidSponsor(params);
     const maxFee = this.getValidMaxFee(params);
     let rawMessage = this.getValidRawMessage(params);
 
@@ -561,9 +567,25 @@ export class MessageBridge extends AbstractContract {
     this.validateUint(params.nonce, methodName);
   }
 
-  private getValidSponsor(): string {
-    this.validateScriptHash(this.config.account.scriptHash, 'feeSponsor');
-    return this.config.account.scriptHash;
+  /** Validates and returns the fee sponsor script hash from the parameters.
+   *
+   * @param params The basic parameters containing the fee sponsor.
+   *
+   * @returns The validated fee sponsor script hash.
+   *
+   * @remarks
+   * Currently, we only allow the sender account to be the fee sponsor.
+   *
+   * @throws InvalidParameterError if the fee sponsor is provided and does not match the sender account script hash.
+   */
+  private getValidSponsor(params: BasicParams): string {
+    let defaultFeeSponsor = this.config.account.scriptHash;
+    if (params.feeSponsor && params.feeSponsor != defaultFeeSponsor) {
+      throw new InvalidParameterError('feeSponsor', 'must match the sender account script hash');
+    }
+
+    this.validateScriptHash(defaultFeeSponsor, 'feeSponsor');
+    return defaultFeeSponsor;
   }
 
   private getValidMaxFee(params: BasicParams): number {

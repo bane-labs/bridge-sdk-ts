@@ -13,6 +13,7 @@ export interface TransactionResult {
 
 export interface BasicParams {
   maxFee: number;
+  feeSponsor?: string;
 }
 
 export interface SendResultMessageParams extends BasicParams {
@@ -97,3 +98,13 @@ export interface ExecutableState {
 export type { Account };
 
 export type ExecutionResultType = string | boolean | number | StackItemJson[] | undefined;
+
+export interface AssetBalance {
+  assethash: string;
+  amount: string;
+  lastupdatedblock: number;
+}
+
+export interface BalanceResponse {
+  balance: Array<AssetBalance>;
+}

@@ -5,6 +5,10 @@ describe('Library imports', () => {
   it('should import all main exports', async () => {
     const {
       MessageBridge,
+      NativeBridge,
+      TokenBridge,
+      getAllBalances,
+      getGasBalance,
       neonAdapter,
       InvalidParameterError,
       ContractInvocationError,
@@ -13,6 +17,10 @@ describe('Library imports', () => {
     } = await import('../src/index.js');
 
     assert.ok(MessageBridge);
+    assert.ok(NativeBridge);
+    assert.ok(TokenBridge);
+    assert.ok(getAllBalances);
+    assert.ok(getGasBalance);
     assert.ok(neonAdapter);
     assert.ok(InvalidParameterError);
     assert.ok(ContractInvocationError);
@@ -21,9 +29,11 @@ describe('Library imports', () => {
   });
 
   it('should import from built distribution', async () => {
-    const {MessageBridge, neonAdapter} = await import('../dist/index.js');
+    const {MessageBridge, NativeBridge, TokenBridge, neonAdapter} = await import('../dist/index.js');
 
     assert.ok(MessageBridge);
+    assert.ok(NativeBridge);
+    assert.ok(TokenBridge);
     assert.ok(neonAdapter);
   });
 });
