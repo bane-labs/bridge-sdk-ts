@@ -85,7 +85,7 @@ export class ExecutionManager extends AbstractContract {
         this.executeMessage.name,
         [
           neonAdapter.create.contractParam('Integer', nonce),
-          neonAdapter.create.contractParam('ByteArray', executableCode)
+          this.getByteArrayContractParam(executableCode, false)
         ]
     );
   }
@@ -113,7 +113,7 @@ export class ExecutionManager extends AbstractContract {
    */
   async isValidCall(serializedCall: string): Promise<boolean> {
     this.validateHexString(serializedCall, 0);
-    return await this.getBooleanValue(this.isValidCall.name, this.getByteArrayContractParamArray(serializedCall, true));
+    return await this.getBooleanValue(this.isValidCall.name, [this.getByteArrayContractParam(serializedCall, true)]);
   }
 
   /** Check if a serialized call is allowed
@@ -124,7 +124,7 @@ export class ExecutionManager extends AbstractContract {
    */
   async isAllowedCall(serializedCall: string): Promise<boolean> {
     this.validateHexString(serializedCall, 0);
-    return await this.getBooleanValue(this.isAllowedCall.name, this.getByteArrayContractParamArray(serializedCall, true));
+    return await this.getBooleanValue(this.isAllowedCall.name, [this.getByteArrayContractParam(serializedCall, true)]);
   }
 
   // endregion

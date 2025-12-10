@@ -333,9 +333,7 @@ export class MessageBridge extends AbstractContract {
    */
   async isValidCall(serializedCall: string): Promise<boolean> {
     this.validateHexString(serializedCall, 0);
-    const params = this.getByteArrayContractParamArray(serializedCall);
-
-    return await this.getBooleanValue(this.isValidCall.name, params);
+    return await this.getBooleanValue(this.isValidCall.name, [this.getByteArrayContractParam(serializedCall)]);
   }
 
   /** Checks whether a serialized contract call is allowed to be executed.
@@ -346,12 +344,7 @@ export class MessageBridge extends AbstractContract {
    */
   async isAllowedCall(serializedCall: string): Promise<boolean> {
     this.validateHexString(serializedCall, 0);
-    let littleEndianHexString = neonAdapter.utils.HexString.fromHex(serializedCall, true) as any;
-    const params = [
-      neonAdapter.create.contractParam('ByteArray', littleEndianHexString),
-    ];
-
-    return await this.getBooleanValue(this.isAllowedCall.name, params);
+    return await this.getBooleanValue(this.isAllowedCall.name, [this.getByteArrayContractParam(serializedCall)]);
   }
 
   // endregion
@@ -593,9 +586,17 @@ export class MessageBridge extends AbstractContract {
     return params.maxFee;
   }
 
-  private getValidRawMessage(params: MessageParams): string {
-    let messageData = this.messageToBytes(params.messageData);
-    return neonAdapter.utils.ab2hexstring(new Uint8Array(messageData));
+  /** Converts and returns the message data into a valid raw message format.
+   *
+   * @param params The message parameters containing the message data.
+   *
+   * @returns The raw message in the format expected by the MessageBridge contract.
+   */
+  private getValidRawMessage(params: MessageParams): any {
+    let messageDataArray = this.messageToBytes(params.messageData);
+    return neonAdapter.utils.HexString.fromHex(
+        neonAdapter.utils.ab2hexstring(new Uint8Array(messageDataArray)), true
+    ) as any;
   }
 
   private messageToBytes(messageData: string | number[]): number[] {

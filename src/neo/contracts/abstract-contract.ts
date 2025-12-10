@@ -183,11 +183,9 @@ export abstract class AbstractContract {
     });
   }
 
-  protected getByteArrayContractParamArray(callHex: string, isLittleEndian: boolean = true): ContractParam[] {
+  protected getByteArrayContractParam(callHex: string, isLittleEndian: boolean = true): ContractParam {
     let littleEndianHexString = neonAdapter.utils.HexString.fromHex(callHex, isLittleEndian) as any;
-    return [
-      neonAdapter.create.contractParam('ByteArray', littleEndianHexString),
-    ];
+    return neonAdapter.create.contractParam('ByteArray', littleEndianHexString);
   }
 
   /** Validates whether a given string is a valid hexadecimal string of a specified length.
@@ -243,7 +241,7 @@ export abstract class AbstractContract {
 
   private convertToHexString(keyType: keyof typeof ContractParamType, value: any) {
     if (keyType in ['ByteString', 'Buffer', 'PublicKey', 'Hash160', 'Hash256'] && typeof value === 'string') {
-      value = neonAdapter.utils.HexString.fromHex(value);
+      value = neonAdapter.utils.HexString.fromHex(value, true);
     }
     return value;
   }
