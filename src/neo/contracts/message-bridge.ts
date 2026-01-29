@@ -1,20 +1,22 @@
 import { neonAdapter } from '../n3/neon-adapter.js';
-import {
-  type ContractWrapperConfig,
-  type ExecutableState,
-  InvalidParameterError,
-  type MessageBridgeConfigData,
-  type MessageBridgeData,
-  type NeoMessage,
-  type NeoMetadataUnion,
-  type SendExecutableMessageParams,
-  type SendResultMessageParams,
-  type SendStoreOnlyMessageParams,
-  type State,
-  type TransactionResult,
-} from '../types/index.js';
 import { sendContractTransaction } from '../n3/neo-utils.js';
-import { BasicParams, ExecutionResultType, MessageParams } from '../types/interfaces.js';
+import { InvalidParameterError } from '../types/errors.js';
+import type {
+  ContractWrapperConfig,
+  ExecutableState,
+  MessageBridgeConfigData,
+  MessageBridgeData,
+  NeoMessage,
+  NeoMetadataUnion,
+  SendExecutableMessageParams,
+  SendResultMessageParams,
+  SendStoreOnlyMessageParams,
+  State,
+  TransactionResult,
+  BasicParams,
+  ExecutionResultType,
+  MessageParams,
+} from '../types/interfaces.js';
 import { ContractParamJson } from '@cityofzion/neon-core/lib/sc/ContractParam';
 import { AbstractContract } from './abstract-contract.js';
 
@@ -543,7 +545,7 @@ export class MessageBridge extends AbstractContract {
       if (params.messageData.length === 0) {
         throw new InvalidParameterError(`messageData for ${methodName}`, `non-empty byte array`);
       }
-      if (!params.messageData.every(b => Number.isInteger(b) && b >= 0 && b <= 255)) {
+      if (!params.messageData.every((b: number) => Number.isInteger(b) && b >= 0 && b <= 255)) {
         throw new InvalidParameterError(`messageData for ${methodName}`, `array of bytes (0-255)`);
       }
     } else {

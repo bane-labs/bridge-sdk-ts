@@ -5,7 +5,8 @@ import {
   neonAdapter,
   type StackItemJson
 } from '../n3/neon-adapter.js';
-import { ContractInvocationError, type ContractWrapperConfig, InvalidParameterError } from '../types/index.js';
+import { ContractInvocationError, InvalidParameterError } from '../types/errors.js';
+import type { ContractWrapperConfig } from '../types/interfaces.js';
 import { invokeFunction } from '../n3/rpc-utils.js';
 
 // Define types for stack item values and decoded results

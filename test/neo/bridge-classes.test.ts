@@ -1,10 +1,10 @@
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert';
-import type { ContractWrapperConfig } from '../src';
-import { NativeBridge, TokenBridge } from '../src';
+import type { NeoContractWrapperConfig } from '../../src';
+import { NeoNativeBridge, NeoTokenBridge } from '../../src';
 
 describe('Bridge Classes', () => {
-  let mockConfig: ContractWrapperConfig;
+  let mockConfig: NeoContractWrapperConfig;
 
   before(() => {
     mockConfig = {
@@ -19,15 +19,15 @@ describe('Bridge Classes', () => {
     };
   });
 
-  describe('NativeBridge', () => {
-    let bridge: NativeBridge;
+  describe('NeoNativeBridge', () => {
+    let bridge: NeoNativeBridge;
 
     before(() => {
-      bridge = new NativeBridge(mockConfig);
+      bridge = new NeoNativeBridge(mockConfig);
     });
 
     it('should create NativeBridge instance', () => {
-      assert.ok(bridge instanceof NativeBridge);
+      assert.ok(bridge instanceof NeoNativeBridge);
     });
 
     it('should store config correctly', () => {
@@ -43,15 +43,15 @@ describe('Bridge Classes', () => {
     });
   });
 
-  describe('TokenBridge', () => {
-    let bridge: TokenBridge;
+  describe('NeoTokenBridge', () => {
+    let bridge: NeoTokenBridge;
 
     before(() => {
-      bridge = new TokenBridge(mockConfig);
+      bridge = new NeoTokenBridge(mockConfig);
     });
 
     it('should create TokenBridge instance', () => {
-      assert.ok(bridge instanceof TokenBridge);
+      assert.ok(bridge instanceof NeoTokenBridge);
     });
 
     it('should store config correctly', () => {

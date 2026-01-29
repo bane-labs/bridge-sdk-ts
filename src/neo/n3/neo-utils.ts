@@ -8,7 +8,8 @@ import {
   Signer,
   WitnessScope
 } from './neon-adapter.js';
-import { ContractInvocationError, InsufficientFundsError, type TransactionResult } from '../types/index.js';
+import { ContractInvocationError, InsufficientFundsError } from '../types/errors.js';
+import type { TransactionResult } from '../types/interfaces.js';
 import { QueryLike } from '@cityofzion/neon-core/lib/rpc/Query';
 import { RpcQueryError } from '../types/errors.js';
 import { AssetBalance, BalanceResponse } from "../types/interfaces";

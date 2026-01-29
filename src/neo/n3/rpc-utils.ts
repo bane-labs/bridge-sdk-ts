@@ -7,7 +7,7 @@ import {
   Signer,
   StackItemJson
 } from './neon-adapter';
-import { ContractInvocationError } from '../types';
+import { ContractInvocationError } from '../types/errors.js';
 
 type InvokeReturnValue = string | boolean | number | StackItemJson[];
 

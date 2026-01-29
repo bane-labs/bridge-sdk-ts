@@ -1,11 +1,11 @@
 import {before, describe, it} from 'node:test';
 import assert from 'node:assert';
-import type {ContractWrapperConfig, SendExecutableMessageParams} from '../src';
-import {InvalidParameterError, MessageBridge, neonAdapter} from '../src';
+import type {NeoContractWrapperConfig, NeoSendExecutableMessageParams} from '../../src';
+import {NeoInvalidParameterError, NeoMessageBridge, neonAdapter} from '../../src';
 
 describe('MessageBridge', () => {
-    let bridge: MessageBridge;
-    let mockConfig: ContractWrapperConfig;
+    let bridge: NeoMessageBridge;
+    let mockConfig: NeoContractWrapperConfig;
 
     before(() => {
         mockConfig = {
@@ -18,12 +18,12 @@ describe('MessageBridge', () => {
                 publicKey: '0x' + 'c'.repeat(66)
             }
         };
-        bridge = new MessageBridge(mockConfig);
+        bridge = new NeoMessageBridge(mockConfig);
     });
 
     describe('Constructor', () => {
         it('should create MessageBridge instance', () => {
-            assert.ok(bridge instanceof MessageBridge);
+            assert.ok(bridge instanceof NeoMessageBridge);
         });
 
         it('should store config correctly', () => {
@@ -34,7 +34,7 @@ describe('MessageBridge', () => {
 
     describe('Parameter validation', () => {
         it('should validate message parameters correctly', () => {
-            const validParams: SendExecutableMessageParams = {
+            const validParams: NeoSendExecutableMessageParams = {
                 messageData: 'test message',
                 maxFee: 1000000,
                 storeResult: true
@@ -56,7 +56,7 @@ describe('MessageBridge', () => {
 
             assert.throws(() => {
                 (bridge as any).validateMessageParams(invalidParams, 'test');
-            }, InvalidParameterError);
+            }, NeoInvalidParameterError);
         });
 
         it('should reject empty message data', () => {
@@ -68,7 +68,7 @@ describe('MessageBridge', () => {
 
             assert.throws(() => {
                 (bridge as any).validateMessageParams(invalidParams, 'test');
-            }, InvalidParameterError);
+            }, NeoInvalidParameterError);
         });
     });
 
@@ -123,9 +123,9 @@ describe('neonAdapter', () => {
 
 describe('Error classes', () => {
     it('should export InvalidParameterError', () => {
-        const error = new InvalidParameterError('test', 'expected');
+        const error = new NeoInvalidParameterError('test', 'expected');
         assert.ok(error instanceof Error);
-        assert.ok(error instanceof InvalidParameterError);
+        assert.ok(error instanceof NeoInvalidParameterError);
         assert.ok(error.message.includes('test'));
         assert.ok(error.message.includes('expected'));
     });
