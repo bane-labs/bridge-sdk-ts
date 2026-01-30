@@ -21,8 +21,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "test": "tsx --test test/*.test.ts",
-    "test:watch": "node --test --watch test/*.test.ts",
+    "test": "tsx --test test/**/*.test.ts",
+    "test:watch": "node --test --watch test/**/*.test.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

@@ -1,39 +1,36 @@
 import { MessageBridge_abi_3a142650_json, AMBStorage_abi_da8cd343_json} from '@gitmyabi/bane-labs--bridge-evm-contracts/contracts';
-import type { Address, PublicClient, WalletClient } from 'viem';
+import type { Address } from 'viem';
 import type {
   ContractWrapperConfig,
 } from '../types/interfaces.js';
+import { BridgeContractBase } from '../utils/bridge-base.js';
+import { createComposedProxy } from '../utils/proxy-factory.js';
 
-export class MessageBridge extends MessageBridge_abi_3a142650_json {
+// Create a combined type that includes all properties from MessageBridge and only non-conflicting properties from AMBStorage
+export type MessageBridge = MessageBridge_abi_3a142650_json & Omit<AMBStorage_abi_da8cd343_json, keyof MessageBridge_abi_3a142650_json>;
+
+export class MessageBridgeFactory extends MessageBridge_abi_3a142650_json {
   private readonly ambStorage: AMBStorage_abi_da8cd343_json;
 
-  constructor(config: ContractWrapperConfig) {
-    super(config.contractAddress as Address, {
-      publicClient: config.publicClient as PublicClient,
-      walletClient: config.walletClient as WalletClient,
-    });
+  private constructor(config: ContractWrapperConfig) {
+    const contractConfig = BridgeContractBase.createContractConfig(config);
+    super(config.contractAddress as Address, contractConfig);
 
-    this.ambStorage = new AMBStorage_abi_da8cd343_json(config.contractAddress as Address, {
-      publicClient: config.publicClient as PublicClient,
-      walletClient: config.walletClient as WalletClient,
-    });
+    this.ambStorage = BridgeContractBase.createContractInstance(
+      AMBStorage_abi_da8cd343_json,
+      config
+    );
+  }
 
-    // Create a proxy that automatically delegates methods to ambStorage
-    return new Proxy(this, {
-      get(target, prop, receiver) {
-        // If the property exists on the target, use it
-        if (prop in target) {
-          return Reflect.get(target, prop, receiver);
-        }
+  // Create a factory method that returns the proxied instance
+  static create(config: ContractWrapperConfig): MessageBridge {
+    const instance = new MessageBridgeFactory(config);
 
-        // If the property exists on ambStorage and is a function, delegate to it
-        if (prop in target.ambStorage && typeof (target.ambStorage as any)[prop] === 'function') {
-          return (...args: any[]) => (target.ambStorage as any)[prop](...args);
-        }
-
-        return Reflect.get(target, prop, receiver);
-      }
-    });
+    // Use the utility function for proxy creation
+    return createComposedProxy(
+      instance,
+      [instance.ambStorage] as const
+    );
   }
 
   // Access to the composed instance if needed
