@@ -12,7 +12,7 @@ describe('EVM Utilities', () => {
         walletClient: { test: 'wallet' } as any,
       };
 
-      const result = BridgeContractBase.createContractConfig(mockConfig);
+      const result = BridgeContractBase.createViemContractClientsConfig(mockConfig);
 
       assert.ok(result);
       assert.strictEqual(result.publicClient, mockConfig.publicClient);
