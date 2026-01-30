@@ -5,8 +5,8 @@ import {
   EvmMessageBridgeFactory,
   EvmNativeBridgeFactory,
   EvmTokenBridgeFactory,
-  EvmBridgeManagement,
-  EvmExecutionManager
+  EvmBridgeManagementFactory,
+  EvmExecutionManagerFactory
 } from '../../src';
 
 // Mock Viem clients for testing
@@ -111,14 +111,15 @@ describe('EVM Bridge Classes', () => {
   });
 
   describe('EvmBridgeManagement', () => {
-    let bridge: EvmBridgeManagement;
+    let bridge: any;
 
     before(() => {
-      bridge = new EvmBridgeManagement(mockConfig);
+      bridge = EvmBridgeManagementFactory.create(mockConfig);
     });
 
     it('should create BridgeManagement instance', () => {
-      assert.ok(bridge instanceof EvmBridgeManagement);
+      assert.ok(bridge);
+      assert.ok(typeof bridge === 'object');
     });
 
     it('should store contract address correctly', () => {
@@ -132,14 +133,15 @@ describe('EVM Bridge Classes', () => {
   });
 
   describe('EvmExecutionManager', () => {
-    let bridge: EvmExecutionManager;
+    let bridge: any;
 
     before(() => {
-      bridge = new EvmExecutionManager(mockConfig);
+      bridge = EvmExecutionManagerFactory.create(mockConfig);
     });
 
     it('should create ExecutionManager instance', () => {
-      assert.ok(bridge instanceof EvmExecutionManager);
+      assert.ok(bridge);
+      assert.ok(typeof bridge === 'object');
     });
 
     it('should store contract address correctly', () => {
@@ -159,7 +161,7 @@ describe('EVM Bridge Classes', () => {
         walletClient: mockWalletClient,
       };
 
-      const bridge = new EvmBridgeManagement(configWithWallet);
+      const bridge = EvmBridgeManagementFactory.create(configWithWallet);
       assert.ok(bridge);
       assert.strictEqual(bridge.address, configWithWallet.contractAddress);
     });
@@ -171,7 +173,7 @@ describe('EVM Bridge Classes', () => {
         // walletClient is optional
       };
 
-      const bridge = new EvmExecutionManager(configWithoutWallet);
+      const bridge = EvmExecutionManagerFactory.create(configWithoutWallet);
       assert.ok(bridge);
       assert.strictEqual(bridge.address, configWithoutWallet.contractAddress);
     });

@@ -7,18 +7,16 @@ describe('EVM Library imports', () => {
       EvmMessageBridgeFactory,
       EvmNativeBridgeFactory,
       EvmTokenBridgeFactory,
-      EvmBridgeManagement,
-      EvmExecutionManager,
+      EvmBridgeManagementFactory,
+      EvmExecutionManagerFactory,
     } = await import('../../src');
 
     // Factory exports (explicit factory names)
     assert.ok(EvmMessageBridgeFactory);
     assert.ok(EvmNativeBridgeFactory);
     assert.ok(EvmTokenBridgeFactory);
-
-    // Simple contract exports
-    assert.ok(EvmBridgeManagement);
-    assert.ok(EvmExecutionManager);
+    assert.ok(EvmBridgeManagementFactory);
+    assert.ok(EvmExecutionManagerFactory);
   });
 
   it('should import EVM factory classes with create methods', async () => {
@@ -26,21 +24,25 @@ describe('EVM Library imports', () => {
       EvmMessageBridgeFactory,
       EvmNativeBridgeFactory,
       EvmTokenBridgeFactory,
+      EvmBridgeManagementFactory,
+      EvmExecutionManagerFactory,
     } = await import('../../src');
 
     assert.ok(typeof EvmMessageBridgeFactory.create === 'function');
     assert.ok(typeof EvmNativeBridgeFactory.create === 'function');
     assert.ok(typeof EvmTokenBridgeFactory.create === 'function');
+    assert.ok(typeof EvmBridgeManagementFactory.create === 'function');
+    assert.ok(typeof EvmExecutionManagerFactory.create === 'function');
   });
 
-  it('should import EVM simple contract classes as constructors', async () => {
+  it('should import EVM factory classes as constructors', async () => {
     const {
-      EvmBridgeManagement,
-      EvmExecutionManager,
+      EvmBridgeManagementFactory,
+      EvmExecutionManagerFactory,
     } = await import('../../src');
 
-    assert.ok(typeof EvmBridgeManagement === 'function');
-    assert.ok(typeof EvmExecutionManager === 'function');
+    assert.ok(typeof EvmBridgeManagementFactory === 'function');
+    assert.ok(typeof EvmExecutionManagerFactory === 'function');
   });
 
   it('should import EVM types', async () => {
@@ -54,7 +56,7 @@ describe('EVM Library imports', () => {
   it('should verify factory classes are callable', async () => {
     const {
       EvmMessageBridgeFactory,
-      EvmBridgeManagement,
+      EvmBridgeManagementFactory,
     } = await import('../../src');
 
     // Mock config for testing
@@ -66,17 +68,15 @@ describe('EVM Library imports', () => {
 
     // Factory classes should have static create method
     assert.ok(typeof EvmMessageBridgeFactory.create === 'function');
-
-    // Simple contract classes should be constructable
-    assert.ok(typeof EvmBridgeManagement === 'function');
+    assert.ok(typeof EvmBridgeManagementFactory.create === 'function');
 
     // Test that factory creates valid objects
     const bridge = EvmMessageBridgeFactory.create(mockConfig);
     assert.ok(bridge);
     assert.strictEqual(bridge.address, mockConfig.contractAddress);
 
-    // Test that constructor creates valid objects
-    const management = new EvmBridgeManagement(mockConfig);
+    // Test that factory creates valid objects
+    const management = EvmBridgeManagementFactory.create(mockConfig);
     assert.ok(management);
     assert.strictEqual(management.address, mockConfig.contractAddress);
   });
