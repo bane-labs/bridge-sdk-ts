@@ -1,8 +1,8 @@
 import {
-  BridgeStorage_abi_e64111c0_json,
-  BridgeStorageV1_abi_164708e0_json,
-  IBridge_abi_7c01303b_json,
-  INativeBridge_abi_ce8c68b5_json
+  BridgeStorage,
+  BridgeStorageV1,
+  IBridge,
+  INativeBridge
 } from '@gitmyabi/bane-labs--bridge-evm-contracts/contracts';
 import type { Address } from 'viem';
 import type { ContractWrapperConfig, } from '../types/interfaces.js';
@@ -11,32 +11,32 @@ import { createComposedProxy } from '../utils/proxy-factory.js';
 
 // Create a combined type that includes all properties from INativeBridge and only non-conflicting properties from both
 // BridgeStorage contracts
-export type NativeBridge = IBridge_abi_7c01303b_json &
-    Omit<INativeBridge_abi_ce8c68b5_json, keyof IBridge_abi_7c01303b_json> &
-    Omit<BridgeStorage_abi_e64111c0_json, keyof INativeBridge_abi_ce8c68b5_json> &
-    Omit<BridgeStorageV1_abi_164708e0_json, keyof INativeBridge_abi_ce8c68b5_json | keyof BridgeStorage_abi_e64111c0_json>;
+export type NativeBridge = IBridge &
+    Omit<INativeBridge, keyof IBridge> &
+    Omit<BridgeStorage, keyof INativeBridge> &
+    Omit<BridgeStorageV1, keyof INativeBridge | keyof BridgeStorage>;
 
-export class NativeBridgeFactory extends INativeBridge_abi_ce8c68b5_json {
-  private readonly bridge: IBridge_abi_7c01303b_json;
-  private readonly bridgeStorage: BridgeStorage_abi_e64111c0_json;
-  private readonly bridgeStorageV1: BridgeStorageV1_abi_164708e0_json;
+export class NativeBridgeFactory extends INativeBridge {
+  private readonly bridge: IBridge;
+  private readonly bridgeStorage: BridgeStorage;
+  private readonly bridgeStorageV1: BridgeStorageV1;
 
   private constructor(config: ContractWrapperConfig) {
     const contractConfig = BridgeContractBase.createContractConfig(config);
     super(config.contractAddress as Address, contractConfig);
 
     this.bridgeStorage = BridgeContractBase.createContractInstance(
-        BridgeStorage_abi_e64111c0_json,
+        BridgeStorage,
         config
     );
 
     this.bridgeStorageV1 = BridgeContractBase.createContractInstance(
-        BridgeStorageV1_abi_164708e0_json,
+        BridgeStorageV1,
         config
     );
 
     this.bridge = BridgeContractBase.createContractInstance(
-        IBridge_abi_7c01303b_json,
+        IBridge,
         config
     );
   }

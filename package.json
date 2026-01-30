@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@cityofzion/neon-js": "5.8.0",
-    "@gitmyabi/bane-labs--bridge-evm-contracts": "^0.0.5",
+    "@gitmyabi/bane-labs--bridge-evm-contracts": "^0.0.6",
     "viem": "^2.45.0"
   },
   "devDependencies": {
