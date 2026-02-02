@@ -18,13 +18,52 @@ npm install @bane-labs/bridge-sdk-ts@beta
 
 ## Usage
 
-Import the main classes and utilities:
+The bridge SDK supports both EVM-compatible chains and the Neo blockchain. Import the appropriate classes and utilities for your target blockchain:
 
 ```typescript
+// For EVM chains
+import { EvmMessageBridgeFactory } from '@bane-labs/bridge-sdk-ts';
+
+// For Neo blockchain
 import { MessageBridge, neonAdapter, InvalidParameterError } from '@bane-labs/bridge-sdk-ts';
 ```
 
-### Example: Creating a MessageBridge
+### EVM Examples
+
+The EVM module provides factories for creating bridge contract instances that work with Ethereum and other EVM-compatible chains.
+
+#### Creating an EVM Message Bridge
+
+```typescript
+import { EvmMessageBridgeFactory } from '@bane-labs/bridge-sdk-ts';
+import { createPublicClient, createWalletClient, http } from 'viem';
+import { neoxMainnet } from 'viem/chains';
+
+const publicClient = createPublicClient({
+  chain: neoxMainnet,
+  transport: http('https://mainnet-1.rpc.banelabs.org')
+});
+
+const walletClient = createWalletClient({
+  chain: neoxMainnet,
+  transport: http('https://mainnet-1.rpc.banelabs.org')
+});
+
+const config = {
+  contractAddress: '0x...your_contract_address...',
+  publicClient,
+  walletClient
+};
+
+const messageBridge = EvmMessageBridgeFactory.create(config);
+```
+
+
+### Neo Examples
+
+The Neo module provides utilities for interacting with Neo blockchain contracts and the neonAdapter for ESM compatibility.
+
+#### Creating a Neo Message Bridge
 
 ```typescript
 import { MessageBridge } from '@bane-labs/bridge-sdk-ts';
@@ -38,7 +77,7 @@ const config = {
 const bridge = new MessageBridge(config);
 ```
 
-### Example: Using neonAdapter
+#### Using neonAdapter
 
 `neonAdapter` is a utility object that provides a clean, ESM-compatible interface to the core features of the [neon-js](https://github.com/CityOfZion/neon-js) library. It normalizes exports and provides type-safe helpers for working with Neo accounts, contract parameters, transactions, and more. Use it to create and validate Neo blockchain objects in both browser and Node.js environments.
 
