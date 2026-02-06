@@ -12,7 +12,7 @@ import { createComposedProxy } from '../utils/proxy-factory.js';
  * - BridgeStorage: Storage management and data persistence
  *
  * The type uses TypeScript's Omit utility to avoid property conflicts by giving
- * priority to INativeBridge over IBridge, and INativeBridge over BridgeStorage.
+ * priority to IBridge over INativeBridge, and INativeBridge over BridgeStorage.
  */
 export type NativeBridge = IBridge &
     Omit<INativeBridge, keyof IBridge> &
@@ -74,7 +74,7 @@ export class NativeBridgeFactory extends INativeBridge {
    *
    * This method creates a composed proxy object that merges functionality from multiple
    * contract instances into a single interface. The proxy delegation follows priority order:
-   * INativeBridge (primary) > IBridge > BridgeStorage. This ensures native-specific methods
+   * IBridge (primary) > INativeBridge > BridgeStorage. This ensures native-specific methods
    * take precedence over generic bridge methods.
    *
    * @param config - The contract wrapper configuration containing address and client settings

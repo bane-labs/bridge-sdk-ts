@@ -16,7 +16,7 @@ import { createComposedProxy } from '../utils/proxy-factory.js';
  * - BridgeStorage: Current version storage management and data persistence
  *
  * The type uses TypeScript's Omit utility to avoid property conflicts by establishing
- * a clear priority hierarchy: ITokenBridge > IBridge > BridgeStorage.
+ * a clear priority hierarchy: IBridge > ITokenBridge > BridgeStorage.
  * This ensures token-specific methods take precedence over generic bridge methods.
  */
 export type TokenBridge = IBridge &
@@ -79,7 +79,7 @@ export class TokenBridgeFactory extends ITokenBridge {
    *
    * This method creates a composed proxy object that merges functionality from multiple
    * contract instances into a single interface. The proxy delegation follows priority order:
-   * ITokenBridge (primary) > IBridge > BridgeStorage. This ensures token-specific methods
+   * IBridge (primary) > ITokenBridge > BridgeStorage. This ensures token-specific methods
    * take precedence over generic bridge methods.
    *
    * @param config - The contract wrapper configuration containing address and client settings
