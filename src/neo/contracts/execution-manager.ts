@@ -1,8 +1,8 @@
 import { neonAdapter } from '../n3/neon-adapter.js';
-import {
-  type ContractWrapperConfig,
-  type TransactionResult,
-} from '../types/index.js';
+import type {
+  ContractWrapperConfig,
+  TransactionResult,
+} from '../types/interfaces.js';
 import { sendContractTransaction } from '../n3/neo-utils.js';
 import { AbstractContract } from './abstract-contract.js';
 import { ContractParamJson } from "@cityofzion/neon-core/lib/sc/ContractParam";
