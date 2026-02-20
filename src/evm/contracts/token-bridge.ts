@@ -2,7 +2,7 @@ import {
   BridgeStorage,
   IBridge,
   ITokenBridge
-} from '@gitmyabi/bane-labs--bridge-evm-contracts/contracts';
+} from '@gitmyabi/axlabs--bridge-evm-contracts/contracts';
 import type { Address } from 'viem';
 import type { ContractWrapperConfig, } from '../types/interfaces.js';
 import { BridgeContractBase } from '../utils/bridge-base.js';

@@ -1,4 +1,4 @@
-import { MessageBridge as MessageBridgeContract } from '@gitmyabi/bane-labs--bridge-evm-contracts/contracts';
+import { MessageBridge as MessageBridgeContract } from '@gitmyabi/axlabs--bridge-evm-contracts/contracts';
 import type { Address } from 'viem';
 import type { ContractWrapperConfig, } from '../types/interfaces.js';
 import { BridgeContractBase } from '../utils/bridge-base.js';
