@@ -10,10 +10,10 @@ A TypeScript ESM library for interacting with the Neo Bridge and related smart c
 
 ## Installation
 
-Because this is still a beta version, to install from npm, run:
+To install from npm, run:
 
 ```
-npm install @bane-labs/bridge-sdk-ts@beta
+npm install @bane-labs/bridge-sdk-ts
 ```
 
 ## Usage
