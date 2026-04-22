@@ -39,10 +39,10 @@ import type { TransactionLike } from '@cityofzion/neon-core/lib/tx/transaction/T
 import type { SignerLike } from '@cityofzion/neon-core/lib/tx/components/Signer';
 import type { BigInteger, HexString } from '@cityofzion/neon-core/lib/u';
 import type { StackItemJson } from '@cityofzion/neon-core/lib/sc/StackItem';
-// Import enums needed at runtime
-import { WitnessScope } from '@cityofzion/neon-core/lib/tx/components/WitnessScope';
-import { StackItemType } from '@cityofzion/neon-core/lib/sc/StackItem';
-import { ContractParamType } from '@cityofzion/neon-core/lib/sc/ContractParam';
+// Runtime enums come from neon-js exports to avoid neon-core ESM/CJS interop issues.
+const WitnessScope = tx.WitnessScope;
+const StackItemType = sc.StackItemType;
+const ContractParamType = sc.ContractParamType;
 
 // Normalize the neon-js exports to proper ESM structure
 // CRITICAL WORKAROUND: neon-js has complex ESM/CJS interop requirements

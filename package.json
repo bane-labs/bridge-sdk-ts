@@ -1,6 +1,6 @@
 {
   "name": "@bane-labs/bridge-sdk-ts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A library for interacting with the Neo Bridge from TypeScript projects.",
   "license": "Apache-2.0",
   "author": "Otniel Nicola",
@@ -21,14 +21,13 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "pretest": "npm run build",
-    "test": "tsx --test test/**/*.test.ts",
+    "test": "npm run build && tsx --test test/**/*.test.ts",
     "test:watch": "node --test --watch test/**/*.test.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@cityofzion/neon-js": "5.8.0",
-    "@gitmyabi/axlabs--bridge-evm-contracts": "^0.0.4",
+    "@cityofzion/neon-js": "5.8.1",
+    "@gitmyabi/bane-labs--bridge-evm-contracts": "^0.0.6",
     "viem": "^2.45.0"
   },
   "devDependencies": {

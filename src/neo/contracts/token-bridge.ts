@@ -165,7 +165,7 @@ export class TokenBridge extends AbstractContract {
    * Only the Governor may call this method
    */
   async setTokenDepositFee(newDepositFees: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newDepositFees, 'ByteArray', 'Integer');
+    const mapParam = this.createMapParam(newDepositFees, 'Hash160', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -209,7 +209,7 @@ export class TokenBridge extends AbstractContract {
    * Only the Governor may call this method
    */
   async setMinTokenDeposit(newMinDeposits: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newMinDeposits, 'ByteArray', 'Integer');
+    const mapParam = this.createMapParam(newMinDeposits, 'Hash160', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -237,7 +237,7 @@ export class TokenBridge extends AbstractContract {
    * Only the Governor may call this method
    */
   async setMaxTokenDeposit(newMaxDeposits: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newMaxDeposits, 'ByteArray', 'Integer');
+    const mapParam = this.createMapParam(newMaxDeposits, 'Hash160', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
@@ -265,7 +265,7 @@ export class TokenBridge extends AbstractContract {
    * Only the Governor may call this method
    */
   async setMaxTokenWithdrawals(newMaxWithdrawals: Map<string,number>): Promise<TransactionResult> {
-    const mapParam = this.createMapParam(newMaxWithdrawals, 'ByteArray', 'Integer');
+    const mapParam = this.createMapParam(newMaxWithdrawals, 'Hash160', 'Integer');
     return await sendContractTransaction(
         this.rpcClient,
         this.config.account,
