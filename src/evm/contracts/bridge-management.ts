@@ -1,4 +1,4 @@
-import { BridgeManagementImpl as BridgeManagementContract } from '@gitmyabi/bane-labs--bridge-evm-contracts/contracts';
+import { BridgeManagementImpl as BridgeManagementContract } from '@gitmyabi/axlabs--bridge-evm-contracts/contracts';
 import type { Address } from 'viem';
 import type {
   ContractWrapperConfig,
